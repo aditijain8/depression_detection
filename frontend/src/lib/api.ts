@@ -199,7 +199,18 @@ export const authApi = {
 export const chatApi = {
   send: async (data: ChatSendRequest): Promise<ChatSendResponse> => {
     if (USE_MOCK) {
-      await delay(800 + Math.random() * 1200);
+      // Frontend-only mode: use the built-in Next.js chat route (Groq if configured, else local responder)
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) return (await res.json()) as ChatSendResponse;
+      } catch {
+        // fall through to canned reply
+      }
+      await delay(800);
       const analysis = randomMockAnalysis(data.message);
       return {
         reply: mockReplies[Math.floor(Math.random() * mockReplies.length)],

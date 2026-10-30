@@ -52,6 +52,7 @@ export interface AuthResponse {
 export interface ChatSendRequest {
   message: string;
   session_id?: number;
+  history?: { role: "user" | "assistant"; content: string }[];
 }
 
 export interface ChatSendResponse {

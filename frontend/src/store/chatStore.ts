@@ -37,6 +37,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       created_at: new Date().toISOString(),
     };
 
+    const history = get()
+      .messages.slice(-14)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+
     set((state) => ({
       messages: [...state.messages, userMsg],
       isLoading: true,
@@ -47,6 +51,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const response = await chatApi.send({
         message: text.trim(),
         session_id: get().sessionId ?? undefined,
+        history,
       });
 
       const assistantMsg: ChatMessage = {
